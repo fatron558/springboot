@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
@@ -31,17 +30,13 @@ public class UserController {
 
     @GetMapping("/admin")
     public String getAllUsers(Model model) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        model.addAttribute("userAuth", user);
         model.addAttribute("users", userService.getAllUsers());
+        model.addAttribute("user", new User());
+        model.addAttribute("allRoles", roleService.getAll());
         return "admin";
     }
-
-    @GetMapping("/admin/add")
-    public String addNewUser(Model model) {
-            model.addAttribute("user", new User());
-            model.addAttribute("allRoles", roleService.getAll());
-        return "add";
-    }
-
 
     @PostMapping("/admin/add")
     public String saveUser(@ModelAttribute("user") User user,
@@ -55,14 +50,6 @@ public class UserController {
         }
         userService.saveUser(user);
         return "redirect:/admin";
-    }
-
-
-    @GetMapping("/admin/edit")
-    public String edit(@RequestParam(name = "id") int id, ModelMap model) {
-        model.addAttribute("user", userService.getUser(id));
-        model.addAttribute("allRoles", roleService.getAll());
-        return "edit";
     }
 
     @PostMapping("/admin/edit")
@@ -79,7 +66,7 @@ public class UserController {
         return "redirect:/admin";
     }
 
-    @GetMapping("/admin/delete")
+    @PostMapping("/admin/delete")
     public String delete(@RequestParam(name = "id") int id) {
         userService.deleteUser(id);
         return "redirect:/admin";
@@ -89,11 +76,6 @@ public class UserController {
     public String userInfo(Model model) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         model.addAttribute("user", user);
-        return "userInfo";
-    }
-
-    @RequestMapping(value = "login", method = RequestMethod.GET)
-    public String loginPage() {
-        return "login";
+        return "info";
     }
 }
