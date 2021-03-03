@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity(name = "User")
 @Table(name = "user")
@@ -134,6 +135,10 @@ public class User implements UserDetails {
     public void removeRole(Role role) {
         roles.remove(role);
         role.getUsers().remove(this);
+    }
+
+    public String getRolesToString() {
+        return roles.stream().map(p -> p.getAuthority() + " ").collect(Collectors.joining());
     }
 
     @Override
