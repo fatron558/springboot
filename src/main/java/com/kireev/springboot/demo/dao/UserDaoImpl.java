@@ -1,7 +1,10 @@
 package com.kireev.springboot.demo.dao;
 
 import com.kireev.springboot.demo.models.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -15,8 +18,12 @@ public class UserDaoImpl implements UserDao {
     @PersistenceContext
     private EntityManager em;
 
+    @Autowired
+    private PasswordEncoder encoder;
+
     @Override
     public void saveUser(User user) {
+        user.setPassword(encoder.encode(user.getPassword()));
         em.persist(user);
         em.flush();
     }
@@ -34,6 +41,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public void editUser(User user) {
+        user.setPassword(encoder.encode(user.getPassword()));
         em.merge(user);
     }
 
